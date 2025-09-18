@@ -13,6 +13,4 @@ public partial class User
     public string Name { get; set; } = null!;
     public int Age { get; set; }
     public int IdCompany { get; set; }
-    public Company? Company { get; set; }
-    
 }

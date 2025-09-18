@@ -12,5 +12,4 @@ public partial class Company
     public int IdCompany { get; set; }
     public string Name { get; set; } = null!;
     public int IdCountry {  get; set; }
-    public List<User> Users { get; set; } = new();
 }
