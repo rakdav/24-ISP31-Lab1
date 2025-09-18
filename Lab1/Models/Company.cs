@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Lab1.Models;
 
 public partial class Company
 {
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int IdCompany { get; set; }
-
     public string Name { get; set; } = null!;
-
-    public virtual ICollection<User> Users { get; set; } = new List<User>();
+    public int IdCountry {  get; set; }
+    public List<User> Users { get; set; } = new();
 }
