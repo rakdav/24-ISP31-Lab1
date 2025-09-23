@@ -146,5 +146,59 @@ using (DubininDemoContext db = new DubininDemoContext())
     }
 
     //соединение трех таблиц
+    var users7 = from u in db.Users
+                 join company in db.Companies on u.IdCompany equals company.IdCompany
+                 join country in db.Country on company.IdCountry equals country.IdCountry
+                 select new
+                 {
+                     Name = u.Name,
+                     Company=company.Name,
+                     Country=country.Name,
+                     Age=u.Age
+                 };
+    foreach (var u in users7)
+    {
+        Console.WriteLine(u.Country + " " + u.Name + " " + u.Company+" "+u.Age);
+    }
 
+    //Группировка
+    //1 способ
+    var groups1 = from u in db.Users
+                 group u by u.IdCompany into g
+                 select new
+                 {
+                     g.Key,
+                     Count=g.Count()
+                 };
+    foreach (var u in groups1)
+    {
+        Console.WriteLine(u.Key + " " + u.Count);
+    }
+    //2 способ
+    var groups2 = db.Users.GroupBy(u => u.IdCompany).
+        Select(g => new
+        {
+            g.Key,
+            Count = g.Count()
+        });
+    foreach (var u in groups1)
+    {
+        Console.WriteLine(u.Key + " " + u.Count);
+    }
+    //Агрегатные операции
+    //Наличие элементов Any()
+    Console.WriteLine(db.Country.Any(u=>u.IdCountry==1));
+    //Все элементы удовлетворяют критерию
+    Console.WriteLine(db.Country.All(u => u.IdCountry == 1));
+
+    //Количество элементов в выборке
+    Console.WriteLine(db.Users.Count());
+    //Количество пользователей старше 40
+    Console.WriteLine(db.Users.Count(p=>p.Age>40));
+    //Минимальное, максимальное и среднее значение
+    Console.WriteLine(db.Users.Min(p=>p.Age));
+    Console.WriteLine(db.Users.Max(p=>p.Age));
+    Console.WriteLine(db.Users.Average(p=>p.Age));
+    //Сумма
+    Console.WriteLine(db.Users.Sum(p => p.Age));
 }
