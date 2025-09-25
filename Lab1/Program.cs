@@ -1,4 +1,5 @@
-﻿using Lab1;
+﻿using Faker;
+using Lab1;
 using Lab1.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
@@ -11,23 +12,26 @@ using (DubininDemoContext db = new DubininDemoContext())
     db.Country.Add(usa);
     db.SaveChanges();
 
-    Company c1 = new Company();
-    c1.Name = "Рога и копыта";
-    c1.IdCountry = db.Country.FirstOrDefault(p=>p.Name== "Россия")!.IdCountry;
-    db.Companies.Add(c1);
+    for (int i = 1; i < 11; i++)
+    {
+        Lab1.Models.Company c1 = new Lab1.Models.Company();
+        c1.Name = Faker.Company.Name();
+        c1.IdCountry = db.Country.FirstOrDefault(p => p.Name == "Россия")!.IdCountry;
+        db.Companies.Add(c1);
 
-    Company c2 = new Company();
-    c2.Name = "Копыта и рога";
-    c2.IdCountry = db.Country.FirstOrDefault(p => p.Name == "США")!.IdCountry;
-    db.Companies.Add(c2);
+        Lab1.Models.Company c2 = new Lab1.Models.Company();
+        c2.Name = Faker.Company.Name();
+        c2.IdCountry = db.Country.FirstOrDefault(p => p.Name == "США")!.IdCountry;
+        db.Companies.Add(c2);
+    }
 
     db.SaveChanges();
 }
 
 using (DubininDemoContext db = new DubininDemoContext())
 {
-    List<Company> CompanyList = db.Companies.ToList();
-    foreach (Company company in CompanyList)
+    List<Lab1.Models.Company> CompanyList = db.Companies.ToList();
+    foreach (Lab1.Models.Company company in CompanyList)
     {
         Console.WriteLine(company.IdCompany+" "+company.Name);
     }
@@ -201,4 +205,32 @@ using (DubininDemoContext db = new DubininDemoContext())
     Console.WriteLine(db.Users.Average(p=>p.Age));
     //Сумма
     Console.WriteLine(db.Users.Sum(p => p.Age));
+    //Объединение
+    var union1 = db.Users.Where(u => u.Age < 40).
+        Union(db.Users.Where(u => u.Name!.Contains("Вася")));
+    foreach (var u in union1)
+    {
+        Console.WriteLine(u.Name);
+    }
+    var result = db.Users.Select(p => new { Name = p.Name })
+    .Union(db.Companies.Select(c => new { Name = c.Name }));
+    foreach (var u in result)
+    {
+        Console.WriteLine(u.Name);
+    }
+    //Пересечение
+    var intersect = db.Users.Where(u => u.Age < 40).
+        Intersect(db.Users.Where(u => u.Name!.Contains("Вася")));
+    foreach (var u in intersect)
+    {
+        Console.WriteLine(u.Name);
+    }
+    //Разность
+    var sel1 = db.Users.Where(u => u.Age > 30);
+    var sel2 = db.Users.Where(u => u.Name!.Contains("Вася"));
+    var raz = sel1.Except(sel2);
+    foreach (var u in raz)
+    {
+        Console.WriteLine(u.Name);
+    }
 }
